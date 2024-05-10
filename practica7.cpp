@@ -63,16 +63,12 @@ Shader directionalShadowShader;
 CameraManager cameraManager;
 Camera camara;
 
+bool pasos = false;
+
 Texture brickTexture;
 Texture dirtTexture;
 Texture plainTexture;
 Texture pisoTexture;
-Texture AgaveTexture;
-
-//Texture 
-Texture uno;
-Texture logofiTexture;
-Texture moon;
 
 //Texturas para el avatar
 Texture cabeza;
@@ -125,6 +121,7 @@ Model jack;
 Model sally;
 Model fantasma;
 Model gato;
+Model nave;
 
 Skybox skybox;
 Skybox skyboxNoche;
@@ -151,8 +148,15 @@ DirectionalLight mainLight;
 //para declarar varias luces de tipo pointlight
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
-//Luz puntual para el ciclo que sera la nariz del zero personaje del extraño mundo de jack
 PointLight pointLights2[MAX_POINT_LIGHTS];
+SpotLight spotLights2[MAX_SPOT_LIGHTS];
+SpotLight spotLights3[MAX_SPOT_LIGHTS];
+
+constexpr int intervalo_reproduccion_ms = 70000; // 4 segundos
+ISoundEngine* engine3 = nullptr; // Declaración global del objeto ISoundEngine
+ISound* sound = nullptr; // Declaración global del objeto ISound
+bool reproduciendo = false; // Estado de reproducción del sonido
+std::chrono::steady_clock::time_point tiempo_ultima_reproduccion; // Tiempo de la última reproducción del sonido
 
 /*
 * unsigned int shadowMapSizeDirectional = 8192; // was 8192 | 256; max 15k
@@ -592,8 +596,9 @@ void CrearPie()
 
 
 //Creando arboles texturizados
+
 //Funcion para los pasos del avatar
-void playFootstepSound() {
+void SonidoPisadas() { 
 	// Crear el motor de sonido (PISTA DE AUDIO CONTINUA)
 	ISoundEngine* engine = createIrrKlangDevice();
 	// Reproducir un archivo de música
@@ -602,6 +607,9 @@ void playFootstepSound() {
 	// Bajar el volumen 
 	sound->setVolume(0.9f);
 }
+
+
+
 
 int main()
 {
@@ -701,8 +709,8 @@ int main()
 	rampa.LoadModel("Models/rampas.obj");
 	cancha = Model();
 	cancha.LoadModel("Models/cancha.obj");
-	//parking = Model();
-	//parking.LoadModel("Models/parking.obj");
+	parking = Model();
+	parking.LoadModel("Models/parking.obj");
 	monarca_Cuerpo = Model();
 	monarca_Cuerpo.LoadModel("Models/cuerpoMariposa.obj");
 	monarca_Derecha = Model();
@@ -719,6 +727,10 @@ int main()
 	//Personajes
 	jack = Model();
 	jack.LoadModel("Models/jack.obj");
+	nave = Model();
+	nave.LoadModel("Models/nave.obj");
+	sally = Model();
+	sally.LoadModel("Models/sally.obj");
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/satelite-izquierda.tga");//
@@ -775,19 +787,26 @@ int main()
 	//contador de luces puntuales
 	unsigned int pointLightCount = 0;
 	//Declaración de primer luz puntual
-	pointLights[0] = PointLight(1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f,
-		-6.0f, 1.5f, 1.5f,
+	pointLights[0] = PointLight(1.0f, 1.0f, 0.0f,
+		5.5f, 3.0f,
+		70.0f, 4.0f, 43.0f, //POS,
 		0.3f, 0.2f, 0.1f);
 	pointLightCount++;
+
+	pointLights[1] = PointLight(1.0f, 1.0f, 0.0f,
+		5.5f, 3.0f,
+		73.0f, 4.0f, 43.0f, //POS,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+	
 	//*************Luz se prende y apaga por medio dealgún ciclo automático ************************
-	//Declaración luces del escenario
+	//Declaración luces casa de jack
 	unsigned int pointLightCount2 = 0;
 	pointLights2[0] = PointLight(1.0f, 0.7f, 0.0f, //Color naranja
 		5.0f, 3.0f, //Luz ambiental y difusa
-		70.0f, 12.0f, -40.0f, //POS
+		-5.0f, 20.0f, -175.0f, //POS
 		0.3f, 0.2f, 0.1f); //intensidad
-	pointLightCount2++; //(70.0f, 0.0f, -40.0) 
+	pointLightCount2++; // - escenair 70.0f, 12.0f, -40.0  
 
 	unsigned int spotLightCount = 0;
 	//linterna
@@ -799,6 +818,33 @@ int main()
 		5.0f); //el cinco es la abertura del cono de la linterna
 	spotLightCount++;
 
+	//................................ Luces para los reflectores del escenario
+	unsigned int spotLightCount2 = 0;
+	spotLights2[0] = SpotLight(1.0f, 0.0f, 0.0f,
+		1.0f, 2.0f,
+		70.0f, 12.0f, -45.0f, //POS
+		0.0f, -1.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		50.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount2++;
+
+	spotLights2[1] = SpotLight(0.0f, 0.0f, 1.0f,
+		1.0f, 2.0f,
+		70.0f, 12.0f, -30.0f, //POS
+		0.0f, -1.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		50.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount2++;
+
+	spotLights2[2] = SpotLight(1.0f, 1.0f, 1.0f,
+		1.0f, 2.0f,
+		70.0f, 12.0f, -10.0f, //POS
+		0.0f, -1.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		50.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount2++;
+
+	
 	/*
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -822,7 +868,7 @@ int main()
 	const char* soundPath = "D:/COMPU GRAFICA/Proyecto/Proyecto/Proyecto/media/La Obsesion De Jack.mp3";
 
 	// Posición del sonido en el espacio (coordenadas x, y, z)
-	vec3df soundPosition(75.0f, 0.0f, -130.0f); // Cambia estas coordenadas según necesites
+	vec3df soundPosition(75.0f, 0.0f, -130.0f); 
 
 	// Cargar el sonido
 	ISoundSource* soundSource = engine1->addSoundSourceFromFile(soundPath);
@@ -835,7 +881,6 @@ int main()
 
 	// Reproducir el sonido en 3D
 	ISound* sound = engine1->play3D(soundSource, soundPosition, true, false, true);
-	//ISound* sound = engine1->play2D(soundPath, true);
 	if (!sound)
 	{
 		printf("Error al reproducir el sonido\n");
@@ -845,7 +890,8 @@ int main()
 	
 	if (sound)
 		sound->setMinDistance(75.0f);
-	playFootstepSound();
+
+	
 	// Variables para controlar la animación
 	float armAngle = 0.0;
 	float armAngle1 = 0.0;
@@ -889,7 +935,13 @@ int main()
 	float MonarcaAngle = 0.0f;
 	float velocidadMonarca = 0.0f;
 	float tiempoTranscurridoMonarca = 1.1f;
+	//Variables mave espacias
+	static float angleNave = 0.0f;
+	float posicionY = 0.0f;
+	float yVelocidad = 1.0f;
 	////Loop mientras no se cierra la ventana
+	SonidoPisadas();
+
 	while (!mainWindow.getShouldClose())
 	{
 		GLfloat now = glfwGetTime();
@@ -902,17 +954,11 @@ int main()
 		//camera.keyControl(mainWindow.getsKeys(), deltaTime);
 		//camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 		// Cambiar entre las cámaras según la entrada del usuario (por ejemplo, presionar la tecla '9')
-		if (mainWindow.getCambioCamara1() == 1.0f)
-		{
+		if (mainWindow.getCambioCamara1() == 1.0f) {
 			cameraManager.switchToThirdPerson();
-			//cameraManager.switchCamera("terceraPersona");
-			//printf("DENTRO DEL switchToThirdPerson()\n");
 		}
-		else if (mainWindow.getCambioCamara2() == 0.0f)
-		{
+		else if (mainWindow.getCambioCamara2() == 0.0f) {
 			cameraManager.switchToAerial();
-			//cameraManager.switchCamera("aerea");
-			//printf("DENTRO DEL switchToAerial()\n");
 		}
 
 		// Controlar la cámara activa
@@ -959,7 +1005,9 @@ int main()
 		shaderList[0].SetDirectionalLight(&mainLight);
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
-
+		shaderList[0].SetSpotLights(spotLights2, spotLightCount2);
+		// shaderList[0].SetSpotLights(spotLights3, spotLightCount3);
+		//shaderList[0].SetPointLights(pointLights3, pointLightCount3);
 		//Ciclo automático que prende y apaga la luz
 		// Actualizar el temporizador
 		luz_timer -= deltaTime;
@@ -968,21 +1016,31 @@ int main()
 		if (luz_timer <= 0.0f)
 		{
 			luz_encendida = !luz_encendida;
-
 			if (luz_encendida)
 			{
 				shaderList[0].SetPointLights(pointLights2, pointLightCount2); //Prende luz
-				//printf("Luz encendida\n");
 			}
 			else
 			{
 				shaderList[0].SetPointLights(pointLights2, pointLightCount2 - 1); //Apaga luz
-				//printf("Luz apagada\n");
 			}
-
 			// Reiniciar el temporizador a 5 segundos
 			luz_timer = 5.0f;
 		}
+
+		// ......................... Metodo para prender y apagar la luz de la linterna con una tecla
+		// Dentro del segundo bucle (con tecla)
+		if (mainWindow.getTecla7() == 1.0f) {
+			shaderList[0].SetSpotLights(spotLights, spotLightCount - 1);
+		}
+		if (mainWindow.getTecla8() == -1.0f) {
+			shaderList[0].SetSpotLights(spotLights, spotLightCount);
+		}
+
+		/*-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz
+		if (mainWindow.getTeclaH() == 1.0f) {
+			shaderList[0].SetPointLights(pointLights, pointLightCount);
+		}*/
 		/*************************************************** ANIMACIONES BASICAS
 		***************************************************/
 		// Simular movimiento de caminata del avatar
@@ -1115,14 +1173,6 @@ int main()
 		float posX = radioAuto * cos(velocidadAngular * tiempoAuto);
 		float posZ = radioAuto * sin(velocidadAngular * tiempoAuto);
 
-		// Iterar a través de un rango de parámetro t
-		/*for (float t = 0.0f; t <= 10.0f * M_PI; t += 0.1f) {
-			// Calcular las coordenadas (x, y, z) en función del parámetro t
-			Espiralx = t * cos(t);
-			Espiraly = t * sin(t);
-			Espiralz = 0.1f * t; // Controla la altura de la espiral
-		}*/
-
 		// Actualizar el temporizador
 		espiral_time -= deltaTime;
 
@@ -1145,6 +1195,17 @@ int main()
 			// Incrementar el tiempo para avanzar en la animación
 			t += angularSpeed;
 		}
+		// :::::::::::::::::::::::::::::::::::: Movimiento de la nave
+		// Actualizar posición vertical de la nave
+		posicionY += yVelocidad;
+		if (posicionY > 1.0f || posicionY < -1.0f) {
+			yVelocidad = -yVelocidad; // Invertir la dirección al alcanzar los límites
+		}
+		angleNave += 1.0f;  // Velocidad de rotación
+		 // Si alcanza 360 grados, reinicia el ángulo
+		if (angleNave >= 360.0f) {
+			angleNave = 0.0f;
+		}
 
 		glm::mat4 model(1.0);
 		glm::mat4 model1(1.0); //Matriz para el avatar
@@ -1162,6 +1223,7 @@ int main()
 		glm::mat4 modelDescanso(1.0); //Matriz para otra zona
 		glm::mat4 modelaux4(1.0); //Matriz auxiliar para mariposa
 		glm::mat4 modelPersonajesExtraño(1.0); //Matriz para personajes
+		glm::mat4 modelNave(1.0);
 		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 		model = glm::mat4(1.0);
@@ -1263,6 +1325,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelConcierto));
 		concierto.RenderModel();
 
+		//Model Sally
+		modelConcierto = glm::mat4(1.0);
+		modelConcierto = glm::translate(modelConcierto, glm::vec3(70.0f, 10.0f, -25.0));
+		modelConcierto = glm::rotate(modelConcierto, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		//modelConcierto = glm::scale(modelConcierto, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelConcierto));
+		sally.RenderModel();
+
 		//Modelo Zona comida
 		modelComida = glm::mat4(1.0);
 		modelComida = glm::translate(modelComida, glm::vec3(70.0f, 1.0f, 43.0));
@@ -1272,13 +1342,13 @@ int main()
 		festival.RenderModel();
 
 		//Modelo Zero
+		pointLights2[1].UseLight(5.0f, (1.0f, 1.0f, 1.0f),
+			3.0f, (-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz),
+			0.3f, 0.2f, 0.1f);
 		modelPersonajes = glm::mat4(1.0);
-		modelPersonajes = glm::translate(modelPersonajes, glm::vec3(-70.0f + Espiralx, 3.5f + Espiralx, 43.0 + Espiralz));
-		//modelPersonajes = glm::rotate(modelPersonajes, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-		//modelConcierto = glm::scale(modelConcierto, glm::vec3(30.0f, 1.0f, 1.0f));
+		modelPersonajes = glm::translate(modelPersonajes, glm::vec3(-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPersonajes));
 		zero.RenderModel();
-		//modelHojas
 
 		//Modelo Mariposa Monarca
 		modelHojas = glm::mat4(1.0);
@@ -1307,14 +1377,6 @@ int main()
 		monarca_Izquierda.RenderModel();
 		modelHojas = modelaux4; //descarta lo que no hereda
 
-		/*
-* Model concierto;
-Model festival;
-Model puesto1;
-Model puesto2;
-Model puesto3;
-Model zona1;
-	*/
 		/*
 		//Modelo para el pasillo de piedra
 		modelPasillo = glm::mat4(1.0);
@@ -1353,9 +1415,9 @@ Model zona1;
 
 		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*--*-*-*-*-*-**-*-*-**AUTO-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 		model3 = glm::mat4(1.0);
+		model3 = glm::translate(model3, glm::vec3(posX, 0.0f, posZ));
 		modelaux3 = model3; //lo que hereda
 		model3 = glm::translate(model3, glm::vec3(-60.0f, 1.0f, 130.0F)); //70.0f, 1.0f, 43.0
-		model3 = glm::translate(model3, glm::vec3(posX, 0.0f, posZ));
 		model = glm::rotate(model, -190.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		model3 = glm::scale(model3, glm::vec3(3.0f, 3.0f, 3.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
@@ -1368,6 +1430,7 @@ Model zona1;
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
 		RuedaAutoIzquierdaFrente_M.RenderModel();
 		model3 = modelaux3; //descarta lo que no hereda
+
 		//**************** LLanta izquierda trasera
 		modelaux3 = model3; //lo que hereda
 		model3 = glm::translate(model3, glm::vec3(-65.0f, 1.0f, 128.0));
@@ -1377,23 +1440,40 @@ Model zona1;
 		model3 = modelaux3; //descarta lo que no hereda
 		//**************** LLanta derecha frente
 		modelaux3 = model3; //lo que hereda
-		model3 = glm::translate(model3, glm::vec3(-55.0f, 1.2f, 133.0));
+		model3 = glm::translate(model3, glm::vec3(-55.0f, 1.2f, 132.5));
 		model3 = glm::scale(model3, glm::vec3(3.0f, 3.0f, 3.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
 		RuedaAutoDerechaFrente_M.RenderModel();
 		model3 = modelaux3; //descarta lo que no hereda
 		//**************** LLanta derecha trasera
 		modelaux3 = model3; //lo que hereda
-		model3 = glm::translate(model3, glm::vec3(-65.0f, 1.0f, 133.0));
+		model3 = glm::translate(model3, glm::vec3(-65.0f, 1.0f, 132.5));
 		model3 = glm::scale(model3, glm::vec3(3.0f, 3.0f, 3.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model3));
 		RuedaAutoDerechaAtras_M.RenderModel();
 		model3 = modelaux3; //descarta lo que no hereda
 
-		//Toroide Victoria Genis
+		//-60.0f, 1.0f, 130.0
+		//Nave 
+		modelNave = glm::mat4(1.0);
+		//model = glm::translate(model3, glm::vec3(0.0f, posicionY, yVelocidad));
+		modelNave = glm::translate(modelNave, glm::vec3(5.0f, 35.0f + yVelocidad, 175.0F)); //70.0f, 1.0f, 43.0
+		modelNave = glm::rotate(modelNave, glm::radians(angleNave), glm::vec3(0.0f, 1.0f, 0.0f));
+		modelNave = glm::scale(modelNave, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelNave));
+		nave.RenderModel();
+
+		//Parking
+		modelNave = glm::mat4(1.0);
+		modelNave = glm::translate(modelNave, glm::vec3(5.0f, 0.0f, 150.0f));
+		//modelNave = glm::scale(modelNave, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelNave));
+		parking.RenderModel();
+
+		//Toroide Victoria Genis -> Canasta de basquet
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 33.3f));//-70.0f, 2.5f, 43.0
-		model = glm::rotate(model, 190.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, 190.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 5.0f));
 		color = glm::vec3(0.7f, 0.6f, 0.5f);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA
@@ -1557,7 +1637,6 @@ Model zona1;
 		meshList[7]->RenderMesh();
 		//model = modelaux; //descarta lo que no hereda
 		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* FIN DE LA JERARQUIA DEL AVATAR-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-		
 
 		bool fogEnable = false;
 		// Define variables para los colores
@@ -1630,6 +1709,7 @@ Model zona1;
 			// Configuración para la escena nocturna
 			mainLight.setAmbientDiffuse(glm::vec2(0.15f, 0.0f));
 			mainLight.setDirection(glm::vec3(-1.0f, -150.f, 0.0f)); // Luz apuntando hacia el Oeste (negativo en x)
+			mainWindow.getTecla5();
 			break;
 		}
 
@@ -1646,40 +1726,12 @@ Model zona1;
 		sound->setVolume(volume);
 		// Aumentar el volumen base del sonido
 		//sound->setVolume(0.8f); // Establecer el volumen a 0.8 (80% del volumen máximo)
-
+		
 		glUseProgram(0);
 
 		mainWindow.swapBuffers();
 	}
 
+
 	return 0;
 }
-/*
-* //**************************-*-*-*-*--
-// Función para calcular la intensidad ambiental en función de la hora del día
-GLfloat calcularIntensidadAmbiental(int hour) {
-	// Ejemplo: aumentar la intensidad ambiental durante el día y disminuir durante la noche
-	if (hour >= 6 && hour <= 18) {
-		// Durante el día (de 6:00 a 18:00), intensidad ambiental más alta
-		return 0.8f;
-	}
-	else {
-		// Durante la noche, intensidad ambiental más baja
-		return 0.3f;
-	}
-}
-
-// Función para calcular la intensidad difusa en función de la hora del día
-GLfloat calcularIntensidadDifusa(int hour) {
-	// Ejemplo: intensidad difusa más baja durante la noche
-	if (hour >= 6 && hour <= 18) {
-		// Durante el día (de 6:00 a 18:00), intensidad difusa constante
-		return 0.8f;
-	}
-	else {
-		// Durante la noche, reducir la intensidad difusa
-		return 0.5f;
-	}
-}
-*/
-
