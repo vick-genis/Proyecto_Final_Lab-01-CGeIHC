@@ -731,6 +731,8 @@ int main()
 	nave.LoadModel("Models/nave.obj");
 	sally = Model();
 	sally.LoadModel("Models/sally.obj");
+	gato = Model();
+	gato.LoadModel("Models/gato.obj");
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/satelite-izquierda.tga");//
@@ -796,6 +798,12 @@ int main()
 	pointLights[1] = PointLight(1.0f, 1.0f, 0.0f,
 		5.5f, 3.0f,
 		73.0f, 4.0f, 43.0f, //POS,
+		0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+
+	pointLights[2] = PointLight(1.0f, 1.0f, 0.0f,
+		5.5f, 3.0f,
+		75.0f, 4.0f, 43.0f, //POS,
 		0.3f, 0.2f, 0.1f);
 	pointLightCount++;
 	
@@ -1350,6 +1358,13 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPersonajes));
 		zero.RenderModel();
 
+		//Modelo Gato
+		modelPersonajes = glm::mat4(1.0);
+		modelPersonajes = glm::translate(modelPersonajes, glm::vec3(-75.0f, 1.0f , 43.0));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPersonajes));
+		//gato.RenderModel();
+
+
 		//Modelo Mariposa Monarca
 		modelHojas = glm::mat4(1.0);
 		modelHojas = glm::translate(modelHojas, glm::vec3(0.0f, 0.0f + velocidadMonarca * deltaTime, 0.0f));
@@ -1376,6 +1391,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelHojas));
 		monarca_Izquierda.RenderModel();
 		modelHojas = modelaux4; //descarta lo que no hereda
+
 
 		/*
 		//Modelo para el pasillo de piedra
@@ -1473,7 +1489,7 @@ int main()
 		//Toroide Victoria Genis -> Canasta de basquet
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 33.3f));//-70.0f, 2.5f, 43.0
-		model = glm::rotate(model, 190.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, 190.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 5.0f));
 		color = glm::vec3(0.7f, 0.6f, 0.5f);
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA
@@ -1502,18 +1518,18 @@ int main()
 		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*JERARQUIA DEL AVATAR-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 		//**********************************Cuerpo del avatar
 		model1 = glm::mat4(1.0);
-		//model1 = glm::translate(model1, cameraPosition + glm::vec3(0.0f, -6.0f, 0.0f));
+		model1 = glm::translate(model1, cameraPosition + glm::vec3(0.0f, -6.0f, 0.0f));
 		// Obteniendo la dirección hacia adelante de la cámara
 		glm::vec3 cameraDirection = cameraManager.activeCamera->getCameraDirection();
 		
-		/*if (cameraDirection.z <= 0)
+		if (cameraDirection.z <= 0)
 		{
 			model1 = glm::rotate(model1, -1.0f * cameraDirection.x, glm::vec3(0.0f, 1.0f, 0.0f));
 			//printf("x: %f, y: %f, z: %f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
 		}else if (cameraDirection.z > 0) {
 			model1 = glm::rotate(model1, 1.0f * cameraDirection.x + glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 			//printf("x: %f, y: %f, z: %f\n", cameraDirection.x, cameraDirection.y, cameraDirection.z);
-		}*/
+		}
 		// = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		//model1 = glm::rotate(model1, 180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		modelaux = model1; //lo que hereda
@@ -1648,9 +1664,9 @@ int main()
 		glm::vec3 currentColor = whiteColor;
 
 		// Definir constantes para los intervalos de cambio entre día y noche
-		const float diaDuracion = 50.0f;
-		const float medioDiaDuracion = 100.0f;
-		const float nocheDuracion = 150.0f;
+		const float diaDuracion = 180.0f;
+		const float medioDiaDuracion = 240.0f;
+		const float nocheDuracion = 300.0f;
 
 		// Definir variables para el tiempo transcurrido y el estado actual
 		float tiempoTranscurrido = 0.0f;
