@@ -1,7 +1,7 @@
 #include "CameraManager.h"
 
 CameraManager::CameraManager() : thirdPersonCamera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.3f, 0.5f),
-aerialCamera(glm::vec3(0.0f, 50.0f, 0.0f), glm::vec3(0.0f, 180.0f, 0.0f), 0.0f, -90.0f, 0.3f, 0.0f), thirdPersonCameraWithAvatar(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.3f, 0.5f),
+aerialCamera(glm::vec3(0.0f, 90.0f, 0.0f), glm::vec3(0.0f, 180.0f, 0.0f), 0.0f, -90.0f, 0.3f, 0.0f), thirdPersonCameraWithAvatar(glm::vec3(0.0f, 4.0f, 20.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.3f, 0.5f),
 activeCamera(&thirdPersonCameraWithAvatar),thirdPersonActive(true) {} // Inicialmente, establecemos la cámara de tercera persona como activa {}
 //aerialCamera(glm::vec3(0.0f, 50.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 0.0f, -90.0f, 0.3f, 0.5f)
 
@@ -27,6 +27,8 @@ void CameraManager::mouseControl(GLfloat xChange, GLfloat yChange) {
 glm::mat4 CameraManager::calculateActiveViewMatrix() {
     return activeCamera->calculateViewMatrix();
 }
+
+
 /*
 #include "CameraManager.h"
 CameraManager::CameraManager() : thirdPersonCamera(glm::vec3(0.0f, 2.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f, 0.3f, 0.5f),

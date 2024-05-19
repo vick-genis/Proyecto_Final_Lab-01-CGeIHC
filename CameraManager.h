@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include <unordered_map>
 #include <string>
+#include <irrKlang/irrKlang.h>
+using namespace irrklang;
 
 class CameraManager {
 public:
@@ -15,7 +17,7 @@ public:
 
     void keyControl(bool* keys, GLfloat deltaTime);
     void mouseControl(GLfloat xChange, GLfloat yChange);
-
+    void playFootstepSound2();
     glm::mat4 calculateActiveViewMatrix();
     ThirdPersonCamera thirdPersonCamera;
     AerialCamera aerialCamera;
