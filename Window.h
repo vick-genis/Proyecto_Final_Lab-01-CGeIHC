@@ -40,6 +40,10 @@ public:
 	GLfloat getTecla8() { return is7Pressed; }
 	GLfloat getTeclaH() { return isHPressed; }
 	GLfloat getTecla5() { return 0; }
+	GLfloat getTeclaW() { return wPressed; }
+	GLfloat getTeclaA() { return aPressed; }
+	GLfloat getTeclaS() { return sPressed; }
+	GLfloat getTeclaD() { return dPressed; }
 	~Window();
 private: 
 	GLFWwindow *mainWindow;
@@ -73,6 +77,11 @@ private:
 	GLfloat is7Pressed = 0.0f;
 	GLfloat is8Pressed = 0.0f;
 	GLfloat isHPressed = 0.0f;
+	// Variables para mantener el estado de las teclas
+	bool wPressed = false;
+	bool aPressed = false;
+	bool sPressed = false;
+	bool dPressed = false;
 	bool mouseFirstMoved;
 	//Variable para validar el cambio de camara
 	GLfloat valorCamara = 0.0f;

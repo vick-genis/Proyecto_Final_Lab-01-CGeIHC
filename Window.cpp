@@ -336,6 +336,33 @@ void Window::ManejaTeclado(GLFWwindow* window, int key, int code, int action, in
 		//sound4->setVolume(0.3f);
 	}
 	
+	// Verificar si la tecla ha sido presionada
+	if (action == GLFW_PRESS)
+	{
+		// Activar la variable correspondiente a la tecla presionada
+		if (key == GLFW_KEY_W)
+			theWindow->wPressed = true;
+		else if (key == GLFW_KEY_A)
+			theWindow->aPressed = true;
+		else if (key == GLFW_KEY_S)
+			theWindow->sPressed = true;
+		else if (key == GLFW_KEY_D)
+			theWindow->dPressed = true;
+
+	}
+	// Verificar si la tecla ha sido soltada
+	else if (action == GLFW_RELEASE)
+	{
+		// Desactivar la variable correspondiente a la tecla soltada
+		if (key == GLFW_KEY_W)
+			theWindow->wPressed = false;
+		else if (key == GLFW_KEY_A)
+			theWindow->aPressed = false;
+		else if (key == GLFW_KEY_S)
+			theWindow->sPressed = false;
+		else if (key == GLFW_KEY_D)
+			theWindow->dPressed = false;
+	}
 
 
 	/*Camera thirdPersonCamera, aerialCamera;
