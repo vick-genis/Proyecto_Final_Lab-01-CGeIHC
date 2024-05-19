@@ -3,7 +3,7 @@
 #define CIRCULO_BRESEHAM_H
 #include <vector>
 #include <cmath>
-#include "definition.h" // Suponiendo que tienes definido el tipo VertexColor aquí
+#include "definition.h" 
 
 class CirculoBreseham {
 public:
