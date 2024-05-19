@@ -41,7 +41,7 @@ using namespace irrklang;
 #include "AerialCamera.h"
 #include "CameraManager.h"
 #include "ThirdPersonCameraWithAvatar.h"
-#include "Avatar.h"
+#include "CirculoBreseham.h"
 
 //para iluminación
 #include "CommonValues.h"
@@ -75,15 +75,11 @@ Texture cabeza;
 Texture ropa;
 Texture pata;
 Texture canasta;
+Texture vidrio;
+Texture vidrio2;
  
-Model Kitt_M;
-Model Llanta_M;
-Model Blackhawk_M;
-//Aqui creamos nuevos modelos
-Model Lampara;
+
 //Modelos para las Plantas
-Model Planta1_M;
-Model Girasol_M;
 Model GloboAerostatico_M;
 Model Resbaladilla_M;
 Model GiraGira_M;
@@ -122,6 +118,26 @@ Model sally;
 Model fantasma;
 Model gato;
 Model nave;
+Model señal;
+Model cartel;
+Model cartel2;
+Model cartel3;
+Model tienda2;
+Model tienda3;
+Model arbol;
+Model arbol_jack;
+Model mono;
+Model bancaIzq;
+Model bancaDer;
+Model bote;
+Model cartel4;
+//Modelos para señales
+Model discapacitados;
+Model noPisar;
+Model sanaDistancia;
+Model piedras;
+Model rosas;
+Model flores;
 
 Skybox skybox;
 Skybox skyboxNoche;
@@ -132,7 +148,9 @@ Skybox skyboxMedioDia;
 Material Material_brillante;
 Material Material_opaco;
 
-
+// Crear un objeto Circulo
+CirculoBreseham miCirculo(3.0f, 50.0f);
+CirculoBreseham miCirculo1(2.0f, 50.0f);
 //Sphere cabeza = Sphere(0.5, 20, 20);
 Toroide toroide_Vick = Toroide(1.0f, 0.3f, 15, 20);
 GLfloat deltaTime = 0.0f;
@@ -149,6 +167,7 @@ DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 PointLight pointLights2[MAX_POINT_LIGHTS];
+PointLight pointLights3[MAX_POINT_LIGHTS];
 SpotLight spotLights2[MAX_SPOT_LIGHTS];
 SpotLight spotLights3[MAX_SPOT_LIGHTS];
 
@@ -627,6 +646,7 @@ int main()
 	toroide_Vick.init();
 	toroide_Vick.load();
 
+	miCirculo.init();
 
 	glm::vec3 cameraPosition = cameraManager.activeCamera->getCameraPosition();
 	camara = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), -60.0f, 0.0f, 0.3f, 0.5f);
@@ -654,21 +674,14 @@ int main()
 	//Textura para el toroide
 	canasta = Texture("Textures/naranja_basket.png");
 	canasta.LoadTextureA();
+	vidrio = Texture("Textures/vidrio.tga");
+	vidrio.LoadTextureA();
 
-
-	Lampara = Model();
-	Lampara.LoadModel("Models/lampara.obj");
-	//Modelos Para Plantas
-	Planta1_M = Model();
-	Planta1_M.LoadModel("Models/planta_Jack.obj");
-	Girasol_M = Model();
-	Girasol_M.LoadModel("Models/girasol.obj");
+	//Modelos Para Plantas 
 	GloboAerostatico_M = Model();
 	GloboAerostatico_M.LoadModel("Models/globo_aerostatico.obj");
 	Resbaladilla_M = Model();
 	Resbaladilla_M.LoadModel("Models/resbaladilla.obj");
-	GiraGira_M = Model();
-	GiraGira_M.LoadModel("Models/sin_nombre.obj");
 	SubeBaja_M = Model();
 	SubeBaja_M.LoadModel("Models/subebaja.obj");
 	Area1_M = Model();
@@ -695,8 +708,6 @@ int main()
 	concierto.LoadModel("Models/escenario.obj");
 	festival = Model();
 	festival.LoadModel("Models/festival.obj");
-	festival = Model();
-	festival.LoadModel("Models/festival.obj");
 	puesto1 = Model();
 	puesto1.LoadModel("Models/puesto1.obj");
 	puesto2 = Model();
@@ -710,7 +721,7 @@ int main()
 	cancha = Model();
 	cancha.LoadModel("Models/cancha.obj");
 	parking = Model();
-	parking.LoadModel("Models/parking.obj");
+	parking.LoadModel("Models/parking2.obj");
 	monarca_Cuerpo = Model();
 	monarca_Cuerpo.LoadModel("Models/cuerpoMariposa.obj");
 	monarca_Derecha = Model();
@@ -733,6 +744,45 @@ int main()
 	sally.LoadModel("Models/sally.obj");
 	gato = Model();
 	gato.LoadModel("Models/gato.obj");
+	señal = Model();
+	señal.LoadModel("Models/senial.obj");
+	cartel = Model();
+	cartel.LoadModel("Models/cartel.obj");
+	cartel2 = Model();
+	cartel2.LoadModel("Models/cartel3.obj");
+	cartel4 = Model();
+	cartel4.LoadModel("Models/cartel2.obj");
+	tienda2 = Model();
+	tienda2.LoadModel("Models/tienda2.obj");
+	tienda3 = Model();
+	tienda3.LoadModel("Models/tienda.obj");
+	arbol = Model();
+	arbol.LoadModel("Models/arbol.obj");
+	arbol_jack = Model();
+	arbol_jack.LoadModel("Models/arbol_jack.obj");
+	mono = Model();
+	mono.LoadModel("Models/mono.obj");
+	bancaIzq = Model();
+	bancaIzq.LoadModel("Models/boteYSillas.obj");
+	bancaDer = Model();
+	bancaDer.LoadModel("Models/bancaDer.obj");
+	bote = Model();
+	bote.LoadModel("Models/bote.obj");
+	cartel3 = Model();
+	cartel3.LoadModel("Models/cartelon.obj");
+	//Señales para el piso
+	discapacitados = Model();
+	discapacitados.LoadModel("Models/Discapacitados.obj");
+	noPisar = Model();
+	noPisar.LoadModel("Models/noPisar.obj");
+	sanaDistancia = Model();
+	sanaDistancia.LoadModel("Models/distancia.obj");
+	piedras= Model();
+	piedras.LoadModel("Models/piedras.obj");
+	rosas = Model();
+	rosas.LoadModel("Models/rosas.obj");
+	flores = Model();
+	flores.LoadModel("Models/flores.obj");
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/satelite-izquierda.tga");//
@@ -843,7 +893,8 @@ int main()
 		1.0f, 0.0f, 0.0f,
 		50.0f); //el cinco es la abertura del cono de la linterna
 	spotLightCount2++;
-
+	
+	/*
 	spotLights2[2] = SpotLight(1.0f, 1.0f, 1.0f,
 		1.0f, 2.0f,
 		70.0f, 12.0f, -10.0f, //POS
@@ -851,6 +902,34 @@ int main()
 		1.0f, 0.0f, 0.0f,
 		50.0f); //el cinco es la abertura del cono de la linterna
 	spotLightCount2++;
+	*/
+	//................................Mas luces para carteles
+	spotLights2[2] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.1f, 1.0f,
+		-1.0f, 5.0f, 43.0f, //POS
+		-1.0f, 0.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		50.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount2++;
+
+	spotLights2[3] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.1f, 1.0f,
+		12.0f, 15.0f, 58.0f, //POS
+		0.0f, -1.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		30.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount2++;//12.0f, 3.0f, 58.0f
+
+	//................................Mas luces para carteles
+	unsigned int spotLightCount3 = 0;
+	spotLights3[0] = SpotLight(1.0f, 1.0f, 1.0f,
+		0.0f, 2.0f,
+		-10.0f, 15.0f, 43.0f, //POS
+		0.0f, -1.0f, 0.0f, //DIR 
+		1.0f, 0.0f, 0.0f,
+		15.0f); //el cinco es la abertura del cono de la linterna
+	spotLightCount3++;
+	
 
 	
 	/*
@@ -1014,6 +1093,7 @@ int main()
 		shaderList[0].SetSpotLights(spotLights, spotLightCount);
 		shaderList[0].SetPointLights(pointLights, pointLightCount);
 		shaderList[0].SetSpotLights(spotLights2, spotLightCount2);
+		//shaderList[0].SetSpotLights(spotLights3, spotLightCount3);
 		// shaderList[0].SetSpotLights(spotLights3, spotLightCount3);
 		//shaderList[0].SetPointLights(pointLights3, pointLightCount3);
 		//Ciclo automático que prende y apaga la luz
@@ -1045,15 +1125,12 @@ int main()
 			shaderList[0].SetSpotLights(spotLights, spotLightCount);
 		}
 
-		/*-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz
-		if (mainWindow.getTeclaH() == 1.0f) {
-			shaderList[0].SetPointLights(pointLights, pointLightCount);
-		}*/
+		
 		/*************************************************** ANIMACIONES BASICAS
 		***************************************************/
 		// Simular movimiento de caminata del avatar
 		tiempoA -= deltaTime;
-		if (tiempoA <= 0.0f)
+		if (mainWindow.getTeclaS() || mainWindow.getTeclaA() || mainWindow.getTeclaD() || mainWindow.getTeclaW())//tiempoA <= 0.0f
 		{
 			bandera = !bandera;
 
@@ -1232,6 +1309,19 @@ int main()
 		glm::mat4 modelaux4(1.0); //Matriz auxiliar para mariposa
 		glm::mat4 modelPersonajesExtraño(1.0); //Matriz para personajes
 		glm::mat4 modelNave(1.0);
+		glm::mat4 modelGato(1.0);
+		glm::mat4 modelCirculo(1.0);
+		glm::mat4 modelCirculo1(1.0);
+		glm::mat4 modelCirculo2(1.0);
+		glm::mat4 modelCirculo3(1.0);
+		glm::mat4 modelcartel2(1.0);
+		glm::mat4 modelcartel3(1.0);
+		glm::mat4 modelTienda2(1.0);
+		glm::mat4 modelTienda3(1.0);
+		glm::mat4 modelVidrio(1.0);
+		glm::mat4 modelFlora(1.0);
+		glm::mat4 modelSeniales(1.0);
+		glm::mat4 modelPiedras(1.0);
 		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 		model = glm::mat4(1.0);
@@ -1244,19 +1334,6 @@ int main()
 		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
 		meshList[2]->RenderMesh();
 
-		//Modelo Planta Tipo Extraño mundo de jack
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 15.0));
-		//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Planta1_M.RenderModel();
-
-		//Modelo Planta Girasol
-		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 25.0));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		Girasol_M.RenderModel();
 
 		//Modelo Globo Aerostatico
 		model = glm::mat4(1.0);
@@ -1292,7 +1369,7 @@ int main()
 		modelDescanso = glm::translate(modelDescanso, glm::vec3(-67.0f, -1.0f, -125.0));
 		modelDescanso = glm::scale(modelDescanso, glm::vec3(6.1f, 6.1f, 6.1f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelDescanso));
-		descanso.RenderModel();
+		//descanso.RenderModel();
 
 		//Modelo Zona bosque
 		modelDescanso = glm::mat4(1.0);
@@ -1316,6 +1393,54 @@ int main()
 		modelDescanso = glm::scale(modelDescanso, glm::vec3(4.1f, 4.1f, 4.1f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelDescanso));
 		casa_jack.RenderModel();
+
+		//Modelo Tienda 3 con ventanas transparentes
+		modelTienda3 = glm::mat4(1.0);
+		modelTienda3 = glm::translate(modelTienda3, glm::vec3(-67.0f, 8.0f, -125.0));//-67.0f, -1.0f, -125.0
+		//modelTienda3 = glm::scale(modelTienda3, glm::vec3(14.1f, 14.1f, 14.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelTienda3));
+		tienda3.RenderModel();
+
+		//Vidrio
+		modelVidrio = glm::mat4(1.0);
+		modelVidrio = glm::translate(modelVidrio, glm::vec3(-67.0f, 1.0f, -125.0f));
+		//model = glm::rotate(model, 195.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelVidrio = glm::scale(modelVidrio, glm::vec3(25.0f, 40.0f, 35.0f));
+		//color = glm::vec3(0.0f, 0.0f, 1.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelVidrio));
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+
+		//blending: transparencia o traslucidez
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		vidrio.UseTexture();
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+		glDisable(GL_BLEND);
+
+		//Modelo Tienda 2 con ventanas transparentes
+		modelTienda2 = glm::mat4(1.0);
+		modelTienda2 = glm::translate(modelTienda2, glm::vec3(-40.0f, 1.0f, -175.0));
+		modelTienda2 = glm::scale(modelTienda2, glm::vec3(14.1f, 14.1f, 14.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelTienda2));
+		tienda2.RenderModel();
+
+		//Vidrio
+		modelVidrio = glm::mat4(1.0);
+		modelVidrio = glm::translate(modelVidrio, glm::vec3(-40.0f, 1.0f, -176.0f));
+		//model = glm::rotate(model, 195.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelVidrio = glm::scale(modelVidrio, glm::vec3(25.0f, 40.0f, 26.0f));
+		//color = glm::vec3(0.0f, 0.0f, 1.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelVidrio));
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+
+		//blending: transparencia o traslucidez
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		vidrio.UseTexture();
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+		glDisable(GL_BLEND);
 
 		//Modelo rampa
 		model = glm::mat4(1.0);
@@ -1341,6 +1466,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelConcierto));
 		sally.RenderModel();
 
+		//Model Personaje tipo tim burton
+		modelConcierto = glm::mat4(1.0);
+		modelConcierto = glm::translate(modelConcierto, glm::vec3(70.0f, 10.0f, -28.0));
+		modelConcierto = glm::rotate(modelConcierto, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		//modelConcierto = glm::scale(modelConcierto, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelConcierto));
+		mono.RenderModel();
+
 		//Modelo Zona comida
 		modelComida = glm::mat4(1.0);
 		modelComida = glm::translate(modelComida, glm::vec3(70.0f, 1.0f, 43.0));
@@ -1359,10 +1492,11 @@ int main()
 		zero.RenderModel();
 
 		//Modelo Gato
-		modelPersonajes = glm::mat4(1.0);
-		modelPersonajes = glm::translate(modelPersonajes, glm::vec3(-75.0f, 1.0f , 43.0));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPersonajes));
-		//gato.RenderModel();
+		modelGato = glm::mat4(1.0);
+		modelGato = glm::translate(modelGato, glm::vec3(-75.0f, 1.0f , 43.0));
+		modelGato = glm::scale(modelGato, glm::vec3(0.3f, 0.3f, 0.3f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelGato));
+		gato.RenderModel();
 
 
 		//Modelo Mariposa Monarca
@@ -1392,16 +1526,6 @@ int main()
 		monarca_Izquierda.RenderModel();
 		modelHojas = modelaux4; //descarta lo que no hereda
 
-
-		/*
-		//Modelo para el pasillo de piedra
-		modelPasillo = glm::mat4(1.0);
-		modelPasillo = glm::translate(modelPasillo, glm::vec3(0.0f, 0.0f, 0.0));
-		//modelPasillo = glm::rotate(modelPasillo, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		modelPasillo = glm::scale(modelPasillo, glm::vec3(17.0f, 17.0f, 10.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPasillo));
-		//pasillo.RenderModel();
-		*/
 		//Moto
 		model2 = glm::mat4(1.0);
 		model2 = glm::translate(model2, glm::vec3(0.0f, 0.0f, 0.0f + motorcycleX));
@@ -1488,7 +1612,7 @@ int main()
 
 		//Toroide Victoria Genis -> Canasta de basquet
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 33.3f));//-70.0f, 2.5f, 43.0
+		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 33.4f));//-70.0f, 2.5f, 43.0
 		model = glm::rotate(model, 190.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 5.0f));
 		color = glm::vec3(0.7f, 0.6f, 0.5f);
@@ -1498,7 +1622,7 @@ int main()
 		toroide_Vick.render();
 		//Repetimos el toroide
 		model = glm::mat4(1.0);
-		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 107.3f));//-70.0f, 2.5f, 43.0
+		model = glm::translate(model, glm::vec3(-73.0f, 10.0f, 106.2f));//-70.0f, 2.5f, 43.0
 		model = glm::rotate(model, 190.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 5.0f));
 		color = glm::vec3(0.7f, 0.6f, 0.5f);
@@ -1515,10 +1639,25 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCancha));
 		cancha.RenderModel();
 
+		//Vidrio
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-55.0f, 15.0f, 185.5f));
+		//model = glm::rotate(model, 195.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(16.0f, 30.0f, 20.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		//blending: transparencia o traslucidez
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		vidrio.UseTexture();
+		Material_opaco.UseMaterial(uniformSpecularIntensity, uniformShininess);
+		meshList[4]->RenderMesh();
+		glDisable(GL_BLEND);
+
 		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*JERARQUIA DEL AVATAR-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
 		//**********************************Cuerpo del avatar
 		model1 = glm::mat4(1.0);
-		model1 = glm::translate(model1, cameraPosition + glm::vec3(0.0f, -6.0f, 0.0f));
+		model1 = glm::translate(model1, cameraPosition + glm::vec3(0.0f, -6.5f, 0.0f));
 		// Obteniendo la dirección hacia adelante de la cámara
 		glm::vec3 cameraDirection = cameraManager.activeCamera->getCameraDirection();
 		
@@ -1533,7 +1672,7 @@ int main()
 		// = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		//model1 = glm::rotate(model1, 180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.5f, 4.5f, -4.0f));
+		model1 = glm::translate(model1, glm::vec3(-0.5f, 4.5f, -6.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		//model1 = glm::rotate(model1, 180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
@@ -1543,7 +1682,7 @@ int main()
 		//**********************************************Cabeza del avatar
 		//model = glm::mat4(1.0);
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.5f, 5.5f, -4.0f));
+		model1 = glm::translate(model1, glm::vec3(-0.5f, 5.5f, -6.0f));
 		// = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model1));
@@ -1553,7 +1692,7 @@ int main()
 		
 		//*****************************************Brazo izquierdo del avatar
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(0.2f, 4.5f, -4.0f ));
+		model1 = glm::translate(model1, glm::vec3(0.2f, 4.5f, -6.0f ));
 		model1 = glm::rotate(model1, glm::radians(armAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.4f, 1.0f, 0.5f));
@@ -1565,7 +1704,7 @@ int main()
 		//****************************************Mano izquierdo del avatar
 		modelaux = model1; //lo que hereda
 		model1 = modelaux;
-		model1 = glm::translate(model1, glm::vec3(0.2f, 3.9f + hand1Y, -4.0f - hand1));
+		model1 = glm::translate(model1, glm::vec3(0.2f, 3.9f + hand1Y, -6.0f - hand1));
 		model1 = glm::rotate(model1, glm::radians(handAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.4f, 0.2f, 0.4f));
@@ -1579,7 +1718,7 @@ int main()
 
 		//******************************************Brazo derecho del avatar
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-1.22f, 4.5f, -4.0f));
+		model1 = glm::translate(model1, glm::vec3(-1.22f, 4.5f, -6.0f));
 		model1 = glm::rotate(model1, glm::radians(armAngle1), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.4f, 1.0f, 0.5f));
@@ -1591,7 +1730,7 @@ int main()
 		model1 = modelaux; //descarta lo que no hereda
 		//***************************Mano derecho del avatar
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-1.25f, 3.9f - hand2Y, -4.0f - hand2));
+		model1 = glm::translate(model1, glm::vec3(-1.25f, 3.9f - hand2Y, -6.0f - hand2));
 		model1 = glm::rotate(model1, glm::radians(handAngle1), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.4f, 0.2f, 0.4f));
@@ -1604,7 +1743,7 @@ int main()
 		//***********************************Pierna izquierda del avatar
 		//model = glm::mat4(1.0);
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.25f, 3.6f, -4.0f));
+		model1 = glm::translate(model1, glm::vec3(-0.25f, 3.6f, -6.0f));
 		model1 = glm::rotate(model1, glm::radians(legAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.5f, 0.9f, 0.5f));
@@ -1617,7 +1756,7 @@ int main()
 		//*********************************Pie izquierdo del avatar
 		//model = glm::mat4(1.0);
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.25f, 2.97f, -4.0f - pie));
+		model1 = glm::translate(model1, glm::vec3(-0.25f, 2.97f, -6.0f - pie));
 		model1 = glm::rotate(model1, glm::radians(pieAngle), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.5f, 0.4f, 0.7f));
@@ -1631,7 +1770,7 @@ int main()
 		//***************************Pierna derecha del avatar
 		//model = glm::mat4(1.0);
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.8f, 3.6f, -4.0f));
+		model1 = glm::translate(model1, glm::vec3(-0.8f, 3.6f, -6.0f));
 		model1 = glm::rotate(model1, glm::radians(legAngle1), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.5f, 0.9f, 0.5f));
@@ -1643,7 +1782,7 @@ int main()
 		model1 = modelaux; //descarta lo que no hereda
 		//*****************************Pie derecho del avatar
 		modelaux = model1; //lo que hereda
-		model1 = glm::translate(model1, glm::vec3(-0.8f, 2.97f, -4.0f - pie1));
+		model1 = glm::translate(model1, glm::vec3(-0.8f, 2.97f, -6.0f - pie1));
 		model1 = glm::rotate(model1, glm::radians(pieAngle1), glm::vec3(1.0f, 0.0f, 0.0f));
 		model1 = glm::rotate(model1, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model1 = glm::scale(model1, glm::vec3(0.5f, 0.4f, 0.7f));
@@ -1653,6 +1792,228 @@ int main()
 		meshList[7]->RenderMesh();
 		//model = modelaux; //descarta lo que no hereda
 		//*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* FIN DE LA JERARQUIA DEL AVATAR-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+		//Cartel 
+		modelcartel3 = glm::mat4(1.0);
+		modelcartel3 = glm::translate(modelcartel3, glm::vec3(12.0f, 3.0f, 58.0f));//-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz
+		modelcartel3 = glm::rotate(modelcartel3, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelcartel3 = glm::scale(modelcartel3, glm::vec3(5.0, 5.0f, 5.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelcartel3));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		cartel4.RenderModel();
+
+		//Cartel
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-55.3f, 25.0f, 190.0f));//5.0f, 0.0f, 150.0f
+		//model = glm::rotate(model, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		cartel3.RenderModel();
+
+		//Circulo Bresenham 2
+		modelCirculo3 = glm::mat4(1.0);
+		modelCirculo3 = glm::translate(modelCirculo3, glm::vec3(-50.0f, 38.5f, 180.0f));//-70.0f, 2.5f, 43.0
+		//modelCirculo = glm::rotate(modelCirculo, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCirculo3 = glm::scale(modelCirculo3, glm::vec3(0.5f, 0.5f, 0.5f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCirculo3));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		miCirculo.render();
+
+		//Cartel
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-70.0f, 37.0f, 175.0f));//5.0f, 0.0f, 150.0f
+		//model = glm::rotate(model, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(20.0f, 20.0f, 20.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		cartel.RenderModel();
+
+		//Circulo Bresenham 1
+		modelCirculo1 = glm::mat4(1.0);
+		modelCirculo1 = glm::translate(modelCirculo1, glm::vec3(-73.0f, 33.0f, 173.0f));//-70.0f, 2.5f, 43.0
+		//modelCirculo = glm::rotate(modelCirculo, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCirculo1 = glm::scale(modelCirculo1, glm::vec3(0.5f, 0.5f, 0.5f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCirculo1));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		miCirculo.render();
+
+		//Cartel 2
+		spotLights2[3].UseLight(1.0f, (1.0f, 1.0f, 1.0f),
+			2.0f, (-10.0f, 15.0f, 43.0f), (0.0f, -1.0f, 0.0f),
+			1.0f, 0.0f, 0.0f,
+			5.0f);
+		modelcartel2 = glm::mat4(1.0);
+		modelcartel2 = glm::translate(modelcartel2, glm::vec3(-10.0f, 1.0f, 43.0f));//-70.0f + Espiralx, 4.5f + Espiralx, 43.0 + Espiralz
+		//model = glm::rotate(model, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelcartel2 = glm::scale(modelcartel2, glm::vec3(0.06, 0.06f, 0.06f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelcartel2));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		cartel2.RenderModel();
+
+		//Circulo Bresenham 2
+		modelCirculo2 = glm::mat4(1.0);
+		modelCirculo2 = glm::translate(modelCirculo2, glm::vec3(-9.6f, 6.3f, 41.5f));//-70.0f, 2.5f, 43.0
+		modelCirculo2 = glm::rotate(modelCirculo2, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelCirculo2 = glm::scale(modelCirculo2, glm::vec3(0.1f, 0.1f, 0.1f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCirculo2));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		miCirculo.render();
+
+		//Señal
+		model = glm::mat4(1.0);
+		model= glm::translate(model, glm::vec3(-87.0f, 4.5f, 132.0f));//-60.0f, 1.0f, 130.0F
+		model = glm::rotate(model, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(20.0f, 20.0f, 20.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		señal.RenderModel();
+		
+		//Circulo Bresenham 2
+		modelCirculo = glm::mat4(1.0);
+		modelCirculo = glm::translate(modelCirculo, glm::vec3(-86.0f, 10.3f, 132.0f));//-70.0f, 2.5f, 43.0
+		modelCirculo = glm::rotate(modelCirculo, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(10.0f, 10.0f, 5.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelCirculo));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		miCirculo.render();
+
+		//*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*Señales para el piso y demas modelos para agregar textura
+		modelSeniales = glm::mat4(1.0);
+		modelSeniales = glm::translate(modelSeniales, glm::vec3(-86.0f, 0.7f, 140.0f));//-70.0f, 2.5f, 43.0
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelSeniales = glm::scale(modelSeniales, glm::vec3(4.0f, 4.0f, 4.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelSeniales));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		discapacitados.RenderModel();
+		//-67.0f, 8.0f, -125.0)
+		
+		modelSeniales = glm::mat4(1.0);
+		modelSeniales = glm::translate(modelSeniales, glm::vec3(-40.0f, 0.0f, -125.0f));//-70.0f, 2.5f, 43.0
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelSeniales = glm::scale(modelSeniales, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelSeniales));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		sanaDistancia.RenderModel();
+
+		//70.0f, 0.0f, -25.0
+		modelSeniales = glm::mat4(1.0);
+		modelSeniales = glm::translate(modelSeniales, glm::vec3(45.0f, 0.3f, -25.0f));//-70.0f, 2.5f, 43.0
+		modelSeniales = glm::scale(modelSeniales, glm::vec3(3.0f, 3.0f, 3.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelSeniales));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		noPisar.RenderModel();
+
+		//*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.FIN DE LAS SEÑALES
+		
+
+		//........................................Agregando flora
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(45.0f, 0.0f, 85.0f));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(15.0f, 15.0f, 15.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		piedras.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(-30.0f, 0.0f, 85.0f));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(15.0f, 15.0f, 18.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		piedras.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(30.0f, 0.0f, 50.0f));//12.0f, 3.0f, 58.0f
+		modelPiedras = glm::rotate(modelPiedras, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(2.5f, 1.5f, 2.5f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		rosas.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(-30.0f, 0.0f, 60.0f));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(2.5f, 1.5f, 2.5f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		rosas.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(30.0f, 0.0f, 20.0f));//12.0f, 3.0f, 58.0f
+		modelPiedras = glm::rotate(modelPiedras, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(5.5f, 2.5f, 5.5f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		flores.RenderModel();
+
+		modelFlora = glm::mat4(1.0);
+		modelFlora = glm::translate(modelFlora, glm::vec3(30.0f, 3.0f, -30.0f));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelFlora = glm::scale(modelFlora, glm::vec3(5.0f, 10.0f, 5.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelFlora));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		arbol.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(-45.0f, 0.0f, -70.0));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(15.0f, 15.0f, 18.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		piedras.RenderModel();
+
+		modelPiedras = glm::mat4(1.0);
+		modelPiedras = glm::translate(modelPiedras, glm::vec3(-45.0f, 0.0f, -100.0));//12.0f, 3.0f, 58.0f
+		//modelFlora = glm::rotate(modelFlora, 190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		modelPiedras = glm::scale(modelPiedras, glm::vec3(3.0f, 3.0f, 3.0f));
+		//color = glm::vec3(1.0f, 0.0f, 0.0f);
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(modelPiedras));//FALSE ES PARA QUE NO SEA TRANSPUESTA
+		//glUniform3fv(uniformColor, 1, glm::value_ptr(color));
+		flores.RenderModel();
+
+		//Modelo Arbol spooky
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-35.0f, 0.0f, 45.0));
+		//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		arbol_jack.RenderModel();
+
+		//Modelo Arbol spooky
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(-31.0f, 0.0f, -25.0));
+		model = glm::rotate(model, -190.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		//model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		arbol_jack.RenderModel();
+
+
+		//..................................................FIN DE LA FLORA
+
+		//Agregando mas cositas
+		//Bancas y botes
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(3.5f, 0.0f, 15.0));
+		//model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		bancaIzq.RenderModel();
+
 
 		bool fogEnable = false;
 		// Define variables para los colores
