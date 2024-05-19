@@ -8,5 +8,5 @@ Se actualizaron los documentos con las siguientes modificaciones:
 - falta un obj de animal (ya esta)
 - luz continua (ya esta)
 - faltan dos tiendas con ventanas trasnparentes (ya estan)
-- falta color dos circulos de breseham (ya estan)
+- falta colocar los circulos de breseham (ya estan)
 - señalamientos en el piso (ya estan)
